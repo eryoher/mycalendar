@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Container } from "react-bootstrap";
 import moment from "moment";
+import CalendarDay from "./calendarday";
 
-export default class mycalendar extends Component {
+export default class Mycalendar extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -16,7 +17,11 @@ export default class mycalendar extends Component {
 		const results = [];
 
 		weekdays.forEach((day) => {
-			results.push(<th key={day}>{day}</th>);
+			results.push(
+				<th className={"week-header"} key={day}>
+					{day}
+				</th>
+			);
 		});
 
 		return results;
@@ -24,9 +29,8 @@ export default class mycalendar extends Component {
 
 	renderDays = () => {
 		const { currentMonth } = this.state;
-		const results = [],
-			rows = [],
-			blanks = [];
+		const rows = [],
+			calendarDays = [];
 
 		const daysInMonth = currentMonth.daysInMonth();
 		const firstDay = currentMonth.startOf("month").format("d");
@@ -34,22 +38,20 @@ export default class mycalendar extends Component {
 		let cells = [];
 
 		for (let i = 0; i < firstDay; i++) {
-			blanks.push(<td key={i + 31}>{""}</td>);
+			const classDay = i === 0 ? "weekend-day" : "";
+			calendarDays.push(
+				<td className={classDay} key={i + 31}>
+					{""}
+				</td>
+			);
 		}
 
 		for (let i = 1; i <= daysInMonth; i++) {
-			const day = (
-				<td key={i} className={"calendar-day"}>
-					<span>{i}</span>
-				</td>
-			);
-
-			results.push(day);
+			const dayWeek = parseInt(i) + parseInt(firstDay);
+			calendarDays.push(<CalendarDay key={i} day={i} dayWeek={dayWeek} />);
 		}
 
-		var totalSlots = [...blanks, ...results];
-
-		totalSlots.forEach((row, i) => {
+		calendarDays.forEach((row, i) => {
 			if (i % 7 !== 0) {
 				cells.push(row);
 			} else {
@@ -58,25 +60,23 @@ export default class mycalendar extends Component {
 				cells = [];
 				cells.push(row);
 			}
-			if (i === totalSlots.length - 1) {
+			if (i === calendarDays.length - 1) {
 				let insertRow = cells.slice();
 				rows.push(insertRow);
 			}
 		});
 
-		const trElems = rows.map((d, i) => {
-			return <tr key={i * 100}>{d}</tr>;
+		return rows.map((d, i) => {
+			return <tr key={i}>{d}</tr>;
 		});
-
-		return trElems;
 	};
 
 	render() {
 		return (
-			<Container className={"text-center"}>
+			<Container className={"text-center mt-5"}>
 				<table className={"table table-bordered"}>
-					<thead>
-						<tr className='calendar-header'>{this.renderWeeks()}</tr>
+					<thead className={"table-header"}>
+						<tr>{this.renderWeeks()}</tr>
 					</thead>
 					<tbody>{this.renderDays()}</tbody>
 				</table>
