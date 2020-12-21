@@ -3,8 +3,11 @@ import { Col, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import ColorPick from "../common/colorpick";
 import { Button } from "react-bootstrap";
+import { connect } from "react-redux";
+import { createReminder } from "../../actions";
+import moment from "moment-timezone";
 
-export default class ReminderForm extends Component {
+class ReminderForm extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -21,11 +24,18 @@ export default class ReminderForm extends Component {
 	};
 
 	handleSubmit = () => {
-		console.log(this.state);
+		const { title, hexColor, city, startDate, startTime } = this.state;
+
+		const date = moment(`${moment(startDate).format("L").toString()} ${moment(startTime).format("HH:mm:ss").toString()}`)
+			.tz("America/Bogota")
+			.format("YYYY-MM-DD hh:mm:ss");
+
+		this.props.createReminder({ title, color: hexColor, city, date });
 	};
 
 	render() {
 		const { startDate, startTime, hexColor, title, city } = this.state;
+
 		return (
 			<Row className={"w-100"}>
 				<Col sm={12} className={"text-center"}>
@@ -98,3 +108,10 @@ export default class ReminderForm extends Component {
 		);
 	}
 }
+
+const mapStateToProps = ({ reminders }) => {
+	const { reminder } = reminders;
+	return { reminder };
+};
+
+export default connect(mapStateToProps, { createReminder })(ReminderForm);
