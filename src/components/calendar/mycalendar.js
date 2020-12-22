@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import { Container } from "react-bootstrap";
 import moment from "moment";
 import CalendarDay from "./calendarday";
+import { connect } from "react-redux";
+import { getAllReminders } from "../../actions";
 
-export default class Mycalendar extends Component {
+class Mycalendar extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -11,6 +13,10 @@ export default class Mycalendar extends Component {
 			weekdays: moment.weekdays(), //["Sunday", "Monday", "Tuesday", "Wednessday", "Thursday", "Friday", "Saturday"]
 		};
 	}
+
+	componentDidMount = () => {
+		this.props.getAllReminders();
+	};
 
 	renderWeeks = () => {
 		const { weekdays } = this.state;
@@ -27,7 +33,26 @@ export default class Mycalendar extends Component {
 		return results;
 	};
 
+	filterRemindersByDate = () => {
+		const { allReminders } = this.props;
+		let reminders = {};
+
+		allReminders.forEach((reminder) => {
+			const day = reminder.date.substring(0, 10);
+
+			if (!reminders[day]) {
+				reminders[day] = [];
+			}
+
+			reminders[day].push(reminder);
+		});
+
+		return reminders;
+	};
+
 	renderDays = () => {
+		const { allReminders } = this.props;
+		const remindersByday = allReminders ? this.filterRemindersByDate() : [];
 		const { currentMonth } = this.state;
 		const rows = [],
 			calendarDays = [];
@@ -48,7 +73,9 @@ export default class Mycalendar extends Component {
 
 		for (let i = 1; i <= daysInMonth; i++) {
 			const dayWeek = parseInt(i) + parseInt(firstDay);
-			calendarDays.push(<CalendarDay key={i} day={i} dayWeek={dayWeek} />);
+			calendarDays.push(
+				<CalendarDay reminders={remindersByday} currentMonth={currentMonth.toString()} key={i} day={i} dayWeek={dayWeek} />
+			);
 		}
 
 		calendarDays.forEach((row, i) => {
@@ -72,6 +99,8 @@ export default class Mycalendar extends Component {
 	};
 
 	render() {
+		const { allReminders } = this.props;
+
 		return (
 			<Container className={"text-center mt-5"}>
 				<table className={"table table-bordered"}>
@@ -84,3 +113,10 @@ export default class Mycalendar extends Component {
 		);
 	}
 }
+
+const mapStateToProps = ({ reminders }) => {
+	const { allReminders } = reminders;
+	return { allReminders };
+};
+
+export default connect(mapStateToProps, { getAllReminders })(Mycalendar);

@@ -2,8 +2,6 @@
 	border: 1px solid;
 	width: 10rem;
 	height: 8rem;
-	text-align: left;
-	cursor: pointer;
 }
 
 .table-header {
@@ -41,4 +39,22 @@
 	border: 0px;
 	border-bottom: 1px solid rgb(26, 23, 23);
 	outline: none;
+}
+
+.reminder-view {
+	border: 1px solid black;
+	border-radius: 5px;
+	padding-left: 5px;
+	margin-bottom: 5px;
+	color: #fff;
+	font-size: 10pt;
+	font-weight: bold;
+}
+
+.current-day {
+	margin-bottom: 5px;
+}
+
+.reminder-add-icon {
+	cursor: pointer;
 }

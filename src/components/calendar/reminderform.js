@@ -4,14 +4,15 @@ import DatePicker from "react-datepicker";
 import ColorPick from "../common/colorpick";
 import { Button } from "react-bootstrap";
 import { connect } from "react-redux";
-import { createReminder } from "../../actions";
+import { createReminder, getAllReminders } from "../../actions";
 import moment from "moment-timezone";
+import { formatDate } from "../../constants";
 
 class ReminderForm extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			startDate: new Date(),
+			startDate: props.defaultDate ? new Date(props.defaultDate) : new Date(),
 			startTime: new Date(),
 			hexColor: "#2B2BDC",
 			title: "",
@@ -23,12 +24,20 @@ class ReminderForm extends Component {
 		this.setState({ hexColor: color.hex, selectedColor: color });
 	};
 
+	componentDidUpdate = (prevProps) => {
+		const { reminder } = this.props;
+		if (prevProps.reminder !== reminder && reminder) {
+			this.props.handleCloseModal(); //Close modal
+			this.props.getAllReminders();
+		}
+	};
+
 	handleSubmit = () => {
 		const { title, hexColor, city, startDate, startTime } = this.state;
 
 		const date = moment(`${moment(startDate).format("L").toString()} ${moment(startTime).format("HH:mm:ss").toString()}`)
 			.tz("America/Bogota")
-			.format("YYYY-MM-DD hh:mm:ss");
+			.format(`${formatDate} HH:mm:ss`);
 
 		this.props.createReminder({ title, color: hexColor, city, date });
 	};
@@ -114,4 +123,4 @@ const mapStateToProps = ({ reminders }) => {
 	return { reminder };
 };
 
-export default connect(mapStateToProps, { createReminder })(ReminderForm);
+export default connect(mapStateToProps, { createReminder, getAllReminders })(ReminderForm);

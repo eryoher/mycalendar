@@ -8,3 +8,5 @@ export const Constants = {
 		PROD: "PROD",
 	},
 };
+
+export const formatDate = "YYYY-MM-DD";
