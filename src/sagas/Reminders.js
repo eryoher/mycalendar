@@ -1,10 +1,20 @@
 import { all, call, fork, put, takeEvery } from "redux-saga/effects";
 
-import { CREATE_REMINDER, GET_ALL_REMINDERS, GET_REMINDERS_DAY } from "../constants/ActionsTypes";
+import {
+	CREATE_REMINDER,
+	GET_ALL_REMINDERS,
+	GET_REMINDERS_DAY,
+	REMOVE_REMINDERS_BY_DAY,
+} from "../constants/ActionsTypes";
 
-import { createReminder, getRemindersByDay, getAllReminders } from "../api/Reminders";
+import { createReminder, getRemindersByDay, getAllReminders, removeRemindersByDay } from "../api/Reminders";
 
-import { createReminderSuccess, getAllRemindersSuccess, getRemindersByDaySuccess } from "../actions";
+import {
+	createReminderSuccess,
+	getAllRemindersSuccess,
+	getRemindersByDaySuccess,
+	removeRemindersByDaySuccess,
+} from "../actions";
 
 function* createReminderRequest({ payload }) {
 	try {
@@ -27,6 +37,13 @@ function* getAllRemindersRequest({ payload }) {
 	} catch (error) {}
 }
 
+function* removeRemindersByDayRequest({ payload }) {
+	try {
+		const remove = yield call(removeRemindersByDay, payload);
+		yield put(removeRemindersByDaySuccess(remove));
+	} catch (error) {}
+}
+
 export function* createReminderSaga() {
 	yield takeEvery(CREATE_REMINDER, createReminderRequest);
 }
@@ -39,6 +56,15 @@ export function* getAllRemindersSaga() {
 	yield takeEvery(GET_ALL_REMINDERS, getAllRemindersRequest);
 }
 
+export function* removeRemindersByDaySaga() {
+	yield takeEvery(REMOVE_REMINDERS_BY_DAY, removeRemindersByDayRequest);
+}
+
 export default function* rootSaga() {
-	yield all([fork(createReminderSaga), fork(getAllRemindersSaga), fork(getRemindersByDaySaga)]);
+	yield all([
+		fork(createReminderSaga),
+		fork(getAllRemindersSaga),
+		fork(getRemindersByDaySaga),
+		fork(removeRemindersByDaySaga),
+	]);
 }

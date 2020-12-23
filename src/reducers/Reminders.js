@@ -5,6 +5,8 @@ import {
 	GET_ALL_REMINDERS_SUCCESS,
 	GET_REMINDERS_DAY,
 	GET_REMINDERS_DAY_SUCCESS,
+	REMOVE_REMINDERS_BY_DAY,
+	REMOVE_REMINDERS_BY_DAY_SUCCESS,
 } from "../constants/ActionsTypes";
 
 const initialState = {
@@ -12,6 +14,7 @@ const initialState = {
 	dateReminder: null,
 	reminders: null,
 	allReminders: null,
+	removeReminders: null,
 };
 
 function rootReducer(state = initialState, action) {
@@ -27,7 +30,11 @@ function rootReducer(state = initialState, action) {
 		case GET_ALL_REMINDERS:
 			return { ...state };
 		case GET_ALL_REMINDERS_SUCCESS:
-			return { ...state, allReminders: action.payload };
+			return { ...state, allReminders: action.payload.data };
+		case REMOVE_REMINDERS_BY_DAY:
+			return { ...state, removeReminders: null };
+		case REMOVE_REMINDERS_BY_DAY_SUCCESS:
+			return { ...state, removeReminders: action.payload.data };
 		default:
 			return state;
 	}

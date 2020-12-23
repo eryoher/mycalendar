@@ -4,6 +4,7 @@ import moment from "moment";
 import CalendarDay from "./calendarday";
 import { connect } from "react-redux";
 import { getAllReminders } from "../../actions";
+import { formatDate } from "../../constants";
 
 class Mycalendar extends Component {
 	constructor(props) {
@@ -15,7 +16,21 @@ class Mycalendar extends Component {
 	}
 
 	componentDidMount = () => {
-		this.props.getAllReminders();
+		const { currentMonth } = this.state;
+		this.props.getAllReminders({ dateSearch: currentMonth.format(formatDate) });
+	};
+
+	componentDidUpdate = (prevProps) => {
+		const { reminder, removeReminders } = this.props;
+		const { currentMonth } = this.state;
+
+		if (prevProps.reminder !== reminder && reminder) {
+			this.props.getAllReminders({ dateSearch: currentMonth.format(formatDate) });
+		}
+
+		if (prevProps.removeReminders !== removeReminders && removeReminders) {
+			this.props.getAllReminders({ dateSearch: currentMonth.format(formatDate) });
+		}
 	};
 
 	renderWeeks = () => {
@@ -99,10 +114,11 @@ class Mycalendar extends Component {
 	};
 
 	render() {
-		const { allReminders } = this.props;
+		const { currentMonth } = this.state;
 
 		return (
 			<Container className={"text-center mt-5"}>
+				<div> {currentMonth.format("MMMM")} </div>
 				<table className={"table table-bordered"}>
 					<thead className={"table-header"}>
 						<tr>{this.renderWeeks()}</tr>
@@ -115,8 +131,8 @@ class Mycalendar extends Component {
 }
 
 const mapStateToProps = ({ reminders }) => {
-	const { allReminders } = reminders;
-	return { allReminders };
+	const { allReminders, reminder, removeReminders } = reminders;
+	return { allReminders, reminder, removeReminders };
 };
 
 export default connect(mapStateToProps, { getAllReminders })(Mycalendar);

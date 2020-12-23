@@ -11,12 +11,14 @@ import { formatDate } from "../../constants";
 class ReminderForm extends Component {
 	constructor(props) {
 		super(props);
+		const { editReminder, defaultDate } = props;
+
 		this.state = {
-			startDate: props.defaultDate ? new Date(props.defaultDate) : new Date(),
-			startTime: new Date(),
-			hexColor: "#2B2BDC",
-			title: "",
-			city: "",
+			startDate: editReminder ? new Date(editReminder.date) : defaultDate ? new Date(defaultDate) : new Date(),
+			startTime: editReminder ? new Date(editReminder.date) : new Date(),
+			hexColor: editReminder ? editReminder.color : "#2B2BDC",
+			title: editReminder ? editReminder.title : "",
+			city: editReminder ? editReminder.city : "",
 		};
 	}
 
@@ -28,18 +30,31 @@ class ReminderForm extends Component {
 		const { reminder } = this.props;
 		if (prevProps.reminder !== reminder && reminder) {
 			this.props.handleCloseModal(); //Close modal
-			this.props.getAllReminders();
 		}
 	};
 
 	handleSubmit = () => {
 		const { title, hexColor, city, startDate, startTime } = this.state;
+		const { editReminder } = this.props;
 
-		const date = moment(`${moment(startDate).format("L").toString()} ${moment(startTime).format("HH:mm:ss").toString()}`)
-			.tz("America/Bogota")
-			.format(`${formatDate} HH:mm:ss`);
+		const date = moment(
+			`${moment(startDate).format("L").toString()} ${moment(startTime).format("HH:mm:ss").toString()}`
+		).tz("America/Bogota");
 
-		this.props.createReminder({ title, color: hexColor, city, date });
+		const params = {
+			title,
+			color: hexColor,
+			city,
+			realDate: date.format(formatDate),
+			date: date.format(`${formatDate} HH:mm:ss`),
+			active: true,
+		};
+
+		if (editReminder) {
+			params["id"] = editReminder.id;
+		}
+
+		this.props.createReminder(params);
 	};
 
 	render() {
@@ -51,6 +66,7 @@ class ReminderForm extends Component {
 					<input
 						placeholder={"Add Title"}
 						className={"reminder-input"}
+						maxLength={30}
 						value={title}
 						onChange={(data) => {
 							this.setState({ title: data.target.value });

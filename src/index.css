@@ -1,7 +1,9 @@
 .calendar-day {
 	border: 1px solid;
 	width: 10rem;
+	max-width: 158px;
 	height: 8rem;
+	max-height: 128px;
 }
 
 .table-header {
@@ -48,6 +50,7 @@
 	margin-bottom: 5px;
 	color: #fff;
 	font-size: 10pt;
+	cursor: pointer;
 	font-weight: bold;
 }
 

@@ -1,34 +1,42 @@
 import React, { Component } from "react";
 import { Fragment } from "react";
-import { Modal } from "react-bootstrap";
 import ReminderForm from "./reminderform";
 import moment from "moment";
 import { connect } from "react-redux";
-import { getRemindersByDay } from "../../actions";
+import { getRemindersByDay, removeRemindersByDay } from "../../actions";
 import { formatDate } from "../../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import { faPlusCircle, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import CommonModal from "../common/commonModal";
 
 class CalendarDay extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			showModal: false,
+			showRemoveModal: false,
+			editReminder: null,
 		};
 	}
 
-	componentDidMount = () => {
-		const { day, currentMonth } = this.props;
-		const newDate = moment(currentMonth).set("date", day);
-		//this.props.getRemindersByDay({ daydate: newDate.format(formatDate) });
+	componentDidUpdate = (prevProps) => {
+		const { removeReminders } = this.props;
+		if (prevProps.removeReminders !== removeReminders && removeReminders && removeReminders.count) {
+			this.setState({ showRemoveModal: false });
+		}
 	};
-
 	handleCloseModal = () => {
 		this.setState({ showModal: false });
 	};
 
 	handleOpenModal = () => {
-		this.setState({ showModal: true });
+		this.setState({ showModal: true, editReminder: null });
+	};
+
+	handleRemoveReminders = () => {
+		const { currentMonth, day } = this.props;
+		const removeDate = moment(currentMonth).set("date", day);
+		this.props.removeRemindersByDay({ removeDate });
 	};
 
 	renderday = (day, reminders) => {
@@ -37,16 +45,27 @@ class CalendarDay extends Component {
 			<div className={"current-day d-flex justify-content-between"} key={0}>
 				<span>{day}</span>
 				<span className={"reminder-add-icon"}>
+					{reminders && <FontAwesomeIcon className={"mr-1"} onClick={this.toggleRemoveModal} icon={faTimesCircle} />}
 					{<FontAwesomeIcon onClick={this.handleOpenModal} icon={faPlusCircle} />}
 				</span>
 			</div>
 		);
 
 		if (reminders) {
+			reminders.sort((a, b) => {
+				return new Date(a.date) - new Date(b.date);
+			});
+
 			reminders.forEach((remind) => {
+				const { title } = remind;
 				results.push(
-					<div key={remind.id} className={"reminder-view"} style={{ backgroundColor: remind.color }}>
-						{remind.title}
+					<div
+						key={remind.id}
+						onClick={() => this.selectReminder(remind)}
+						className={"reminder-view"}
+						style={{ backgroundColor: remind.color }}
+					>
+						{title.length >= 15 ? `${title.substring(0, 12)}...` : title}
 					</div>
 				);
 			});
@@ -55,9 +74,17 @@ class CalendarDay extends Component {
 		return results;
 	};
 
+	selectReminder = (reminder) => {
+		this.setState({ editReminder: reminder, showModal: true });
+	};
+
+	toggleRemoveModal = () => {
+		this.setState((state) => ({ showRemoveModal: !state.showRemoveModal }));
+	};
+
 	render() {
 		const { dayWeek, day, currentMonth, reminders } = this.props;
-		const { showModal } = this.state;
+		const { showModal, editReminder, showRemoveModal } = this.state;
 
 		const newDate = moment(currentMonth).set("date", day);
 		const remindersByday = reminders[newDate.format(formatDate)];
@@ -67,25 +94,38 @@ class CalendarDay extends Component {
 		return (
 			<Fragment>
 				<td className={classDay}>{this.renderday(day, remindersByday)}</td>
+				<CommonModal
+					showModal={showRemoveModal}
+					handleCloseModal={this.toggleRemoveModal}
+					handleSubmit={this.handleRemoveReminders}
+					buttons
+					modalTitle={"Delete reminder"}
+					modalBody={"Are you sure you want to remove the reminders of the day"}
+					closeButton={"Close"}
+					submitButton={"Delete"}
+				/>
 
-				<Modal show={showModal} onHide={this.handleCloseModal} aria-labelledby={"ModalHeader"}>
-					<Modal.Header closeButton>{"New reminder"}</Modal.Header>
-					<Modal.Body>
+				<CommonModal
+					showModal={showModal}
+					handleCloseModal={this.handleCloseModal}
+					modalTitle={"New reminder"}
+					modalBody={
 						<ReminderForm
+							editReminder={editReminder}
 							defaultDate={newDate.toString()}
 							handleSubmit={this.handleSubmit}
 							handleCloseModal={this.handleCloseModal}
 						/>
-					</Modal.Body>
-				</Modal>
+					}
+				/>
 			</Fragment>
 		);
 	}
 }
 
 const mapStateToProps = ({ reminders }) => {
-	const { reminder } = reminders;
-	return { reminder };
+	const { reminder, removeReminders } = reminders;
+	return { reminder, removeReminders };
 };
 
-export default connect(mapStateToProps, { getRemindersByDay })(CalendarDay);
+export default connect(mapStateToProps, { getRemindersByDay, removeRemindersByDay })(CalendarDay);
