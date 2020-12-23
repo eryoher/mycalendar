@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import ColorPick from "../common/colorpick";
 import { Button } from "react-bootstrap";
 import { connect } from "react-redux";
-import { createReminder, getAllReminders } from "../../actions";
+import { createReminder, getAllReminders, getWeatherByCity } from "../../actions";
 import moment from "moment-timezone";
 import { formatDate } from "../../constants";
 
@@ -59,7 +59,7 @@ class ReminderForm extends Component {
 
 	render() {
 		const { startDate, startTime, hexColor, title, city } = this.state;
-
+		const { weatherByDay } = this.props;
 		return (
 			<Row className={"w-100"}>
 				<Col sm={12} className={"text-center"}>
@@ -103,6 +103,10 @@ class ReminderForm extends Component {
 						placeholder={"City"}
 						className={"reminder-input"}
 						value={city}
+						onBlur={(evt) => {
+							console.log(evt.target.value);
+							this.props.getWeatherByCity({ city: evt.target.value });
+						}}
 						onChange={(data) => {
 							this.setState({ city: data.target.value });
 						}}
@@ -121,6 +125,21 @@ class ReminderForm extends Component {
 				<Col sm={1} className={"text-center"}>
 					<ColorPick handleChange={this.handleChangeColor} color={hexColor} />
 				</Col>
+				<Col>
+					{weatherByDay && (
+						<div>
+							<div className='location-box'>
+								<div className='location'>
+									{weatherByDay.name}, {weatherByDay.sys.country}
+								</div>
+							</div>
+							<div className='weather-box'>
+								<div className='temp'>{Math.round(weatherByDay.main.temp)}°c</div>
+								<div className='weather'>{weatherByDay.weather[0].main}</div>
+							</div>
+						</div>
+					)}
+				</Col>
 				<Col sm={12} className={"mt-4 text-center"}>
 					<Button className={"mr-3"} variant='secondary' onClick={this.props.handleCloseModal}>
 						{"Close"}
@@ -134,9 +153,10 @@ class ReminderForm extends Component {
 	}
 }
 
-const mapStateToProps = ({ reminders }) => {
+const mapStateToProps = ({ reminders, weathers }) => {
 	const { reminder } = reminders;
-	return { reminder };
+	const { weatherByDay } = weathers;
+	return { reminder, weatherByDay };
 };
 
-export default connect(mapStateToProps, { createReminder, getAllReminders })(ReminderForm);
+export default connect(mapStateToProps, { createReminder, getAllReminders, getWeatherByCity })(ReminderForm);
