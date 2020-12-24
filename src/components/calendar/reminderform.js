@@ -110,6 +110,7 @@ class ReminderForm extends Component {
 									className={`reminder-input ${touched.title && errors.title ? "require-error" : ""}`}
 									maxLength={30}
 									value={values.title}
+									onBlur={handleBlur}
 									onChange={(data) => {
 										//this.setState({ title: data.target.value });
 										setFieldValue("title", data.target.value);
@@ -121,6 +122,7 @@ class ReminderForm extends Component {
 									selected={values.startDate}
 									name={"startDate"}
 									value={values.startDate}
+									onBlur={handleBlur}
 									fixedHeight
 									className={`reminder-input-date ${touched.startDate && errors.startDate ? "require-error" : ""}`}
 									onChange={(date) => {
@@ -141,6 +143,7 @@ class ReminderForm extends Component {
 									dateFormat='h:mm aa'
 									name={"startTime"}
 									value={values.startTime}
+									onBlur={handleBlur}
 									onChange={(date) => {
 										this.setState({ startTime: date });
 										setFieldValue("startTime", date);
@@ -158,6 +161,7 @@ class ReminderForm extends Component {
 										}
 									}}
 									onBlur={(evt) => {
+										handleBlur(evt);
 										this.props.getWeatherByCity({ city: evt.target.value });
 									}}
 									onChange={(data) => {
@@ -172,6 +176,7 @@ class ReminderForm extends Component {
 									name={"hexColor"}
 									className={`reminder-input ${touched.hexColor && errors.hexColor ? "require-error" : ""}`}
 									value={values.hexColor}
+									onBlur={handleBlur}
 									onChange={(data) => {
 										this.setState({ hexColor: data.target.value });
 										setFieldValue("hexColor", data.target.value);

@@ -91,7 +91,13 @@ class Mycalendar extends Component {
 		for (let i = 1; i <= daysInMonth; i++) {
 			const dayWeek = parseInt(i) + parseInt(firstDay);
 			calendarDays.push(
-				<CalendarDay reminders={remindersByday} currentMonth={currentMonth.toString()} key={i} day={i} dayWeek={dayWeek} />
+				<CalendarDay
+					reminders={remindersByday}
+					currentMonth={currentMonth.format(formatDate).toString()}
+					key={i}
+					day={i}
+					dayWeek={dayWeek}
+				/>
 			);
 		}
 
