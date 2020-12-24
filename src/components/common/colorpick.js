@@ -25,23 +25,18 @@ export default class ColorPick extends Component {
 		const popover = {
 			position: "absolute",
 			zIndex: "2",
-			left: "-25px",
+			left: "-1px",
+			top: "12px",
 		};
-		const cover = {
-			position: "fixed",
-			top: "0px",
-			right: "0px",
-			bottom: "0px",
-			left: "0px",
-		};
+
 		return (
 			<div>
 				<div
 					style={{
 						textAlign: "right",
 						position: "absolute",
-						bottom: 15,
-						right: 20,
+						bottom: 0,
+						right: 50,
 						cursor: "pointer",
 						color: this.props.color,
 					}}

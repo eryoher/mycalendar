@@ -5,6 +5,8 @@ import CalendarDay from "./calendarday";
 import { connect } from "react-redux";
 import { getAllReminders } from "../../actions";
 import { formatDate } from "../../constants";
+import { faArrowAltCircleLeft, faArrowAltCircleRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 class Mycalendar extends Component {
 	constructor(props) {
@@ -113,12 +115,40 @@ class Mycalendar extends Component {
 		});
 	};
 
+	handleLastMonth = () => {
+		const { currentMonth } = this.state;
+		const newdate = currentMonth.subtract(1, "months");
+		this.setNewCurrentMonth(newdate);
+	};
+
+	handleNextMonth = () => {
+		const { currentMonth } = this.state;
+		const newdate = currentMonth.add(1, "M");
+		this.setNewCurrentMonth(newdate);
+	};
+
+	setNewCurrentMonth = (date) => {
+		this.setState({ currentMonth: date });
+		this.props.getAllReminders({ dateSearch: date.format(formatDate) });
+	};
+
 	render() {
 		const { currentMonth } = this.state;
 
 		return (
 			<Container className={"text-center mt-5"}>
-				<div> {currentMonth.format("MMMM")} </div>
+				<div className={"current-day d-flex justify-content-between"}>
+					<div className={"change-month d-flex align-items-center"}>
+						<FontAwesomeIcon icon={faArrowAltCircleLeft} onClick={this.handleLastMonth} />
+					</div>
+					<div className={"date-title"}>
+						<div className={"year-title mb-0"}> {currentMonth.format("YYYY")} </div>
+						<div className={"month-title mb-3"}> {currentMonth.format("MMMM")} </div>
+					</div>
+					<div className={"change-month d-flex align-items-center"}>
+						<FontAwesomeIcon icon={faArrowAltCircleRight} onClick={this.handleNextMonth} />
+					</div>
+				</div>
 				<table className={"table table-bordered"}>
 					<thead className={"table-header"}>
 						<tr>{this.renderWeeks()}</tr>

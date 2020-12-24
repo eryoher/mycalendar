@@ -40,10 +40,15 @@ class CalendarDay extends Component {
 	};
 
 	renderday = (day, reminders) => {
+		const { currentMonth } = this.props;
+		const newDate = moment(currentMonth).set("date", day);
+		const today = moment();
+		const classDay = newDate.format(formatDate) === today.format(formatDate) ? "today" : "";
+
 		const results = [];
 		results.push(
 			<div className={"current-day d-flex justify-content-between"} key={0}>
-				<span>{day}</span>
+				<span className={classDay}>{day}</span>
 				<span className={"reminder-add-icon"}>
 					{reminders && <FontAwesomeIcon className={"mr-1"} onClick={this.toggleRemoveModal} icon={faTimesCircle} />}
 					{<FontAwesomeIcon onClick={this.handleOpenModal} icon={faPlusCircle} />}
