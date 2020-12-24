@@ -6,7 +6,7 @@ Calendar application built entirely using React, redux. The calendar itself was 
 
 The calendar app is runing next url page [ calendarApp ](https://mycalendar-react.herokuapp.com/)
 
-if you want to install follow the following steps
+if you want to install follow the next steps
 
 1. git clone https://github.com/eryoher/mycalendar.git
 2. cd mycalendar
